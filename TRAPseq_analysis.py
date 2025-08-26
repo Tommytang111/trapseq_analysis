@@ -341,10 +341,10 @@ def compare_distributions(worm_df, method='chi2'):
     return overall_result, pairwise_result
 
 #Import Data
-df1_0 = pd.read_excel('Data/D819_IP_vs_L450_IP_TRAP_simplified.xlsx', sheet_name=0)
-df1_1 = pd.read_excel('Data/D819_IP_vs_L450_IP_TRAP_simplified.xlsx', sheet_name=1)
-df1_2 = pd.read_excel('Data/D150_IP vs. L3_IP_TRAP_simplified_2 (3).xlsx', sheet_name=0)
-df2 = pd.read_excel('Data/transcription factors.xls', sheet_name=0, skiprows=2)
+df1_0 = pd.read_excel('../Data/D819_IP_vs_L450_IP_TRAP_simplified.xlsx', sheet_name=0)
+df1_1 = pd.read_excel('../Data/D819_IP_vs_L450_IP_TRAP_simplified.xlsx', sheet_name=1)
+df1_2 = pd.read_excel('../Data/D150_IP vs. L3_IP_TRAP_simplified_2 (3).xlsx', sheet_name=0)
+df2 = pd.read_excel('../Data/transcription factors.xls', sheet_name=0, skiprows=2)
 
 
 #Inner join the two dataframes on the 'Gene' column
