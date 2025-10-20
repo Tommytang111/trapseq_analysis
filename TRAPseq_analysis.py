@@ -109,7 +109,8 @@ def make_custom_histogram(worm_df: pd.DataFrame, worm_df2: pd.DataFrame, output_
     #Generate random colors
     np.random.seed(random_seed)  # For reproducibility
     #colors = np.random.rand(len(worm_dict), 3)  # Generate random colors
-    colors = ["#141313", "#0040FF", "#474747", "#FD6C04"] #Manually select colors for each worm
+    colors = ["#141313", "#0040FF", "#6E6E6E", "#FD6C04", "#9608F5", "#F606BE", "#B70040"] #Manually select colors for each worm
+    #["#141313", "#0040FF", "#6E6E6E", "#FD6C04"] Old Colors
 
     #First figure specifications
     fig1 = plt.figure(num=1, figsize=(10, 6))
@@ -344,12 +345,14 @@ def compare_distributions(worm_df, method='chi2'):
 df1_0 = pd.read_excel('../Data/D819_IP_vs_L450_IP_TRAP_simplified.xlsx', sheet_name=0)
 df1_1 = pd.read_excel('../Data/D819_IP_vs_L450_IP_TRAP_simplified.xlsx', sheet_name=1)
 df1_2 = pd.read_excel('../Data/D150_IP vs. L3_IP_TRAP_simplified_2 (3).xlsx', sheet_name=0)
+df1_3 = pd.read_excel('../Data/L114_IP_vs_L3_11_vs_L3_14.xlsx', sheet_name=0)
 df2 = pd.read_excel('../Data/transcription factors.xls', sheet_name=0, skiprows=2)
 
 
 #Inner join the two dataframes on the 'Gene' column
 df = pd.merge(df1_0, df1_1, on='Name', how='inner')
 df = pd.merge(df, df1_2, on='Name', how='inner')
+df = pd.merge(df, df1_3, on='Name', how='inner')
 
 #Preprocessing
 #Remove rows without gene names
@@ -804,11 +807,11 @@ def make_figure(worm_df, worm_df2, group, output_list, save=False, save_name=Non
 
 if __name__ == "__main__":
     #Generate plots and gene list exports
-    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_neuropep, group='Neuropeptide', output_list='Neuropeptide Gene List.xlsx', save=True, save_name='Neuropeptide_Gene_Density.png')
-    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_ion_channels, group='Ion Channel', output_list='Ion Channel Gene List.xlsx', save=True, save_name='Ion_Channel_Gene_Density.png')
-    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_gpcrs, group='GPCR', output_list='GPCR Gene List.xlsx', save=True, save_name='GPCR_Gene_Density.png')
-    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_gap_junctions, group='Gap Junction', output_list='Gap Junction Gene List.xlsx', save=True, save_name='Gap_Junction_Gene_Density.png')
-    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_tfs, group='Transcription Factor', output_list='Transcription Factor Gene List.xlsx', save=True, save_name='Transcription_Factor_Gene_Density.png')
+    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_neuropep, group='Neuropeptide', output_list='../Neuropeptide Gene List.xlsx', save=True, save_name='../Neuropeptide_Gene_Density.png')
+    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_ion_channels, group='Ion Channel', output_list='../Ion Channel Gene List.xlsx', save=True, save_name='../Ion_Channel_Gene_Density.png')
+    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_gpcrs, group='GPCR', output_list='../GPCR Gene List.xlsx', save=True, save_name='../GPCR_Gene_Density.png')
+    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_gap_junctions, group='Gap Junction', output_list='../Gap Junction Gene List.xlsx', save=True, save_name='../Gap_Junction_Gene_Density.png')
+    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_tfs, group='Transcription Factor', output_list='../Transcription Factor Gene List.xlsx', save=True, save_name='../Transcription_Factor_Gene_Density.png')
     
     r1, r1_pair = compare_distributions(df_zero_filtered_tpm, method='chi2')
     r2, r2_pair = compare_distributions(df_zero_filtered_neuropep, method='g')
