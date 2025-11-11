@@ -807,12 +807,12 @@ def make_figure(worm_df, worm_df2, group, output_list, save=False, save_name=Non
 
 if __name__ == "__main__":
     #Generate plots and gene list exports
-    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_neuropep, group='Neuropeptide', output_list='../Neuropeptide Gene List.xlsx', save=True, save_name='../Neuropeptide_Gene_Density.png')
-    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_ion_channels, group='Ion Channel', output_list='../Ion Channel Gene List.xlsx', save=True, save_name='../Ion_Channel_Gene_Density.png')
-    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_gpcrs, group='GPCR', output_list='../GPCR Gene List.xlsx', save=True, save_name='../GPCR_Gene_Density.png')
-    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_gap_junctions, group='Gap Junction', output_list='../Gap Junction Gene List.xlsx', save=True, save_name='../Gap_Junction_Gene_Density.png')
-    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_tfs, group='Transcription Factor', output_list='../Transcription Factor Gene List.xlsx', save=True, save_name='../Transcription_Factor_Gene_Density.png')
-    
+    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_neuropep, group='Neuropeptide', output_list='../Neuropeptide Gene List.xlsx', save=False, save_name='../Neuropeptide_Gene_Density.png')
+    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_ion_channels, group='Ion Channel', output_list='../Ion Channel Gene List.xlsx', save=False, save_name='../Ion_Channel_Gene_Density.png')
+    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_gpcrs, group='GPCR', output_list='../GPCR Gene List.xlsx', save=False, save_name='../GPCR_Gene_Density.png')
+    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_gap_junctions, group='Gap Junction', output_list='../Gap Junction Gene List.xlsx', save=False, save_name='../Gap_Junction_Gene_Density.png')
+    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_tfs, group='Transcription Factor', output_list='../Transcription Factor Gene List.xlsx', save=False, save_name='../Transcription_Factor_Gene_Density.png')
+
     r1, r1_pair = compare_distributions(df_zero_filtered_tpm, method='chi2')
     r2, r2_pair = compare_distributions(df_zero_filtered_neuropep, method='g')
     r3, r3_pair = compare_distributions(df_zero_filtered_ion_channels, method='g')
