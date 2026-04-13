@@ -1,13 +1,13 @@
 #Analysis of C. elegans TRAPseq data
 #Tommy Tang
-#July 14th, 2025
+#Written July 14th, 2025
 
 #Libraries
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from matplotlib.ticker import MaxNLocator, MultipleLocator
+from matplotlib.ticker import MultipleLocator
 from scipy.stats import chi2_contingency, chi2
 import itertools
 from PIL import Image
@@ -16,7 +16,7 @@ import io
 from typing import Union
 
 #Functions
-def make_custom_histogram(worm_df: pd.DataFrame, worm_df2: pd.DataFrame, output_list: str, group: str = 'Group', random_seed=44, gene_list=False, save_imgs=False, img_output:str=None, img2_output:str=None):
+def make_custom_histogram(worm_df: pd.DataFrame, worm_df2: pd.DataFrame, output_list: str, group: str = 'Group', random_seed=44, gene_list=False, save_imgs=False, img_output:str=None, img2_output:str=None) -> tuple[plt.figure, plt.figure]:
     """
     Creates sophisticated mirrored histograms with KDE overlays for comparing gene expression data.
     
@@ -31,7 +31,7 @@ def make_custom_histogram(worm_df: pd.DataFrame, worm_df2: pd.DataFrame, output_
     ----------
     worm_df : pd.DataFrame
         Main dataframe containing all gene expression data. Must have columns matching 
-        the pattern r'^[A-Za-z]\d{3}' (e.g., 'L450', 'D819') and contain TPM columns.
+        the pattern r'^[A-Za-z0-9].*TPM$' (e.g., 'L450', 'D819') and contain TPM columns.
     worm_df2 : pd.DataFrame
         Filtered dataframe containing subset of genes for the specific group of interest 
         (e.g., neuropeptides, ion channels, GPCRs). Must have the same column structure as worm_df.
@@ -61,11 +61,11 @@ def make_custom_histogram(worm_df: pd.DataFrame, worm_df2: pd.DataFrame, output_
     Raises
     ------
     ValueError
-        If column names in either dataframe don't match the required r'^[A-Za-z]\d{3}' pattern.
+        If column names in either dataframe don't match the required r'^[A-Za-z0-9].*TPM$' pattern.
     
     Notes
     -----
-    - The function expects TPM (Transcripts Per Million) columns matching the regex r'^(L|D).*TPM'
+    - The function expects TPM (Transcripts Per Million) columns matching the regex r'.*TPM$'
     - Log₁₀ transformation is applied to TPM values for visualization
     - The second histogram has an inverted y-axis to create a mirrored effect
     - Random colors are generated for each condition for consistent visualization across plots
@@ -87,15 +87,15 @@ def make_custom_histogram(worm_df: pd.DataFrame, worm_df2: pd.DataFrame, output_
     ...     output_list='neuropeptide_bins.xlsx'
     ... )
     """
-    #Requires columns of dataframe df to start with format 'XYYY'. For example, L450.
-    pattern = re.compile(r'^[A-Za-z]\d{3}')
+    #Requires columns of dataframe df to end with format 'TPM'. For example, L450 TPM.
+    pattern = re.compile(r'^[A-Za-z0-9].*TPM$')
     invalid_cols = [col for col in worm_df.columns[1:-1] if not pattern.match(col)]
     invalid_cols2 = [col for col in worm_df2.columns[1:-1] if not pattern.match(col)]
     if invalid_cols or invalid_cols2:
-        raise ValueError(f"Invalid column names: {invalid_cols + invalid_cols2}. All columns must match 'XYYY' starting format.")
+        raise ValueError(f"Invalid column names: {invalid_cols + invalid_cols2}. All columns must match 'TPM' ending format.")
 
     #Data
-    worm_cols = worm_df.filter(regex=r'^(L|D).*TPM').columns #Get relevant columns for each worm
+    worm_cols = worm_df.filter(regex=r'.*TPM$').columns #Get relevant columns for each worm
     worm_df_log = np.log10(worm_df[worm_cols]) #Get log10 dataframe of columns of interest
     worm_group_df_log = np.log10(worm_df2[worm_cols]) #Get log10 dataframe of columns of interest for group of interest
     worm_dict = {col: worm_df_log[col].values for col in worm_cols} #Convert to dictionary to iterate over
@@ -320,7 +320,7 @@ def pairwise_tests(series_dict, bins, alpha=0.05, method='chi2'):
 def compare_distributions(worm_df, method='chi2'):
     """Compare distributions using chi-square and G-test."""
     #Take log10 and convert to dictionary
-    worm_cols = worm_df.filter(regex=r'^(L|D).*TPM').columns
+    worm_cols = worm_df.filter(regex=r'.*TPM$').columns
     worm_df_log = np.log10(worm_df[worm_cols])
     worm_dict = {col: worm_df_log[col].values for col in worm_cols}
     
@@ -342,17 +342,19 @@ def compare_distributions(worm_df, method='chi2'):
     return overall_result, pairwise_result
 
 #Import Data
-df1_0 = pd.read_excel('../Data/D819_IP_vs_L450_IP_TRAP_simplified.xlsx', sheet_name=0)
-df1_1 = pd.read_excel('../Data/D819_IP_vs_L450_IP_TRAP_simplified.xlsx', sheet_name=1)
-df1_2 = pd.read_excel('../Data/D150_IP vs. L3_IP_TRAP_simplified_2 (3).xlsx', sheet_name=0)
-df1_3 = pd.read_excel('../Data/L114_IP_vs_L3_11_vs_L3_14.xlsx', sheet_name=0)
-df2 = pd.read_excel('../Data/transcription factors.xls', sheet_name=0, skiprows=2)
+df = pd.read_excel('/Users/tommy/OneDrive/Documents/My_Documents/Work/LTRI/Zhen Lab/Projects/TRAPseq/Data/Mei_RNASeq_Analysis_March272026/Expression Browser.xls')
+df2 = pd.read_excel('/Users/tommy/OneDrive/Documents/My_Documents/Work/LTRI/Zhen Lab/Projects/TRAPseq/Data/transcription factors.xls', sheet_name=0, skiprows=2)
+df = df[["Name", "A11-18 TPM", "A12-15 TPM", "G11-18 TPM", "G12-15 TPM"]]
+# df1_0 = pd.read_excel('../Data/D819_IP_vs_L450_IP_TRAP_simplified.xlsx', sheet_name=0)
+# df1_1 = pd.read_excel('../Data/D819_IP_vs_L450_IP_TRAP_simplified.xlsx', sheet_name=1)
+# df1_2 = pd.read_excel('../Data/D150_IP vs. L3_IP_TRAP_simplified_2 (3).xlsx', sheet_name=0)
+# df1_3 = pd.read_excel('../Data/L114_IP_vs_L3_11_vs_L3_14.xlsx', sheet_name=0)
+# df2 = pd.read_excel('../Data/transcription factors.xls', sheet_name=0, skiprows=2)
 
-
-#Inner join the two dataframes on the 'Gene' column
-df = pd.merge(df1_0, df1_1, on='Name', how='inner')
-df = pd.merge(df, df1_2, on='Name', how='inner')
-df = pd.merge(df, df1_3, on='Name', how='inner')
+# #Inner join the two dataframes on the 'Gene' column
+# df = pd.merge(df1_0, df1_1, on='Name', how='inner')
+# df = pd.merge(df, df1_2, on='Name', how='inner')
+# df = pd.merge(df, df1_3, on='Name', how='inner')
 
 #Preprocessing
 #Remove rows without gene names
@@ -782,6 +784,36 @@ print(f'Number of transcription factor genes found in zero filtered dataset: {df
 
 #Optional function for shortening call to generate figure. For more customization, use make_custom_histogram + stack_images_vertically directly.
 def make_figure(worm_df, worm_df2, group, output_list, save=False, save_name=None):
+    """
+    Generates, displays, and optionally saves a vertically stacked mirrored histogram figure.
+
+    This function calls `make_custom_histogram` to create a two-panel figure comparing 
+    the overall gene distribution (top) with a specific gene group's distribution (bottom).
+    It then stacks these two images vertically, displays the combined result using matplotlib,
+    and optionally saves it to a file. It also outputs an Excel file containing the genes 
+    binned by expression levels.
+
+    Parameters
+    ----------
+    worm_df : pd.DataFrame
+        Main dataframe containing all gene expression data. Must contain TPM columns.
+    worm_df2 : pd.DataFrame
+        Filtered dataframe containing the subset of genes for the specific group of interest.
+    group : str
+        Name of the gene group being analyzed (e.g., 'Neuropeptide', 'Ion Channel').
+    output_list : str
+        File path for exporting the Excel file with binned gene lists.
+    save : bool, optional
+        Whether to save the combined stacked figure to an image file (default is False).
+    save_name : str, optional
+        File path for saving the combined image file (required if save=True).
+
+    Returns
+    -------
+    None
+        The function displays the plot interactively and optionally writes files to disk.
+    """
+    
     fig1, fig2 = make_custom_histogram(
         worm_df=worm_df,
         worm_df2=worm_df2,
@@ -806,12 +838,13 @@ def make_figure(worm_df, worm_df2, group, output_list, save=False, save_name=Non
         new_image.save(save_name, dpi=(300, 300))
 
 if __name__ == "__main__":
+
     #Generate plots and gene list exports
-    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_neuropep, group='Neuropeptide', output_list='../Neuropeptide Gene List.xlsx', save=False, save_name='../Neuropeptide_Gene_Density.png')
-    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_ion_channels, group='Ion Channel', output_list='../Ion Channel Gene List.xlsx', save=False, save_name='../Ion_Channel_Gene_Density.png')
-    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_gpcrs, group='GPCR', output_list='../GPCR Gene List.xlsx', save=False, save_name='../GPCR_Gene_Density.png')
-    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_gap_junctions, group='Gap Junction', output_list='../Gap Junction Gene List.xlsx', save=False, save_name='../Gap_Junction_Gene_Density.png')
-    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_tfs, group='Transcription Factor', output_list='../Transcription Factor Gene List.xlsx', save=False, save_name='../Transcription_Factor_Gene_Density.png')
+    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_neuropep, group='Neuropeptide', output_list='../Figures/New RNAseq/Neuropeptide Gene List.xlsx', save=True, save_name='../Figures/New RNAseq/Neuropeptide_Gene_Density.png')
+    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_ion_channels, group='Ion Channel', output_list='../Figures/New RNAseq/Ion Channel Gene List.xlsx', save=True, save_name='../Figures/New RNAseq/Ion_Channel_Gene_Density.png')
+    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_gpcrs, group='GPCR', output_list='../Figures/New RNAseq/GPCR Gene List.xlsx', save=True, save_name='../Figures/New RNAseq/GPCR_Gene_Density.png')
+    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_gap_junctions, group='Gap Junction', output_list='../Figures/New RNAseq/Gap Junction Gene List.xlsx', save=True, save_name='../Figures/New RNAseq/Gap_Junction_Gene_Density.png')
+    make_figure(worm_df=df_zero_filtered_tpm, worm_df2=df_zero_filtered_tfs, group='Transcription Factor', output_list='../Figures/New RNAseq/Transcription Factor Gene List.xlsx', save=True, save_name='../Figures/New RNAseq/Transcription_Factor_Gene_Density.png')
 
     r1, r1_pair = compare_distributions(df_zero_filtered_tpm, method='chi2')
     r2, r2_pair = compare_distributions(df_zero_filtered_neuropep, method='g')
